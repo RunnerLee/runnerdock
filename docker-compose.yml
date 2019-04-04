@@ -17,6 +17,9 @@ services:
             - www_data:/home/www-data
             - "./services/php5.6/php.ini:/usr/local/etc/php/php.ini"
             - php56_profiling_data:/var/www/profiling
+        environment:
+            PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
+            PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
     php71:
         # build: ./php7.1
         image: php:7.1-fpm
