@@ -15,6 +15,8 @@ services:
         image: php:5.6-fpm
         volumes:
             - www_data:/home/www-data
+            - "./services/php5.6/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+            - "./services/php5.6/conf.d/docker-php-ext-xhprof.ini:/usr/local/etc/php/conf.d/docker-php-ext-xhprof.ini"
             - "./services/php5.6/php.ini:/usr/local/etc/php/php.ini"
             - php56_profiling_data:/var/www/profiling
         environment:
