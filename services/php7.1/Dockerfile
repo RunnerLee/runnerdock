@@ -2,9 +2,6 @@ FROM php:7.1-fpm-alpine
 
 LABEL maintainer="RunnerLee <runnerleer@gmail.com>"
 
-# 替换国内源
-COPY repositories /etc/apk/repositories
-
 # 安装扩展
 RUN docker-php-ext-install bcmath pdo_mysql mysqli pcntl sockets
 
