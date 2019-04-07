@@ -11,8 +11,7 @@ services:
             - "./services/nginx/sites/:/etc/nginx/sites"
             - nginx_log_data:/var/log/nginx
     php56:
-        # build: ./php5.6
-        image: php:5.6-fpm
+        image: runnerlee/php:5.6-fpm
         volumes:
             - www_data:/home/www-data
             - "./services/php5.6/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
@@ -23,14 +22,12 @@ services:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
     php71:
-        # build: ./php7.1
-        image: php:7.1-fpm
+        image: runnerlee/php:7.1-fpm
         volumes:
             - www_data:/home/www-data
             - "./services/php7.1/php.ini:/usr/local/etc/php/php.ini"
     php72:
-        # build: ./php7.2
-        image: php:7.2-fpm
+        image: runnerlee/php:7.2-fpm
         volumes:
             - www_data:/home/www-data
             - "./services/php7.2/php.ini:/usr/local/etc/php/php.ini"
@@ -50,6 +47,29 @@ services:
             MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
             MYSQL_ROOT_HOST: "%"
             MYSQL_ROOT_PASSWORD: ""
+    elasticsearch:
+        image: elasticsearch:6.7.0
+        # see: https://www.elastic.co/guide/en/elasticsearch/reference/6.7/docker.html
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        volumes:
+            - elasticsearch_data:/usr/share/elasticsearch/data
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        environment:
+            cluster.name: "runnerdock-cluster"
+            bootstrap.memory_lock: "true"
+            ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    kibana:
+        image: kibana:6.7.0
+        ports:
+            - "5601:5601"
+        depends_on:
+            - elasticsearch
+
 volumes:
     www_data:
         driver: local
@@ -81,3 +101,9 @@ volumes:
             type: none
             o: bind
             device: ${PHP_PROFILING_PATH}
+    elasticsearch_data:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${ELASTICSEARCH_DATA_PATH}
