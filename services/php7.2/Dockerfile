@@ -38,6 +38,10 @@ RUN apk add --no-cache openssl openssl-dev \
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
+# 安装 mongodb
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
+
 # 安装 composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \

@@ -35,6 +35,10 @@ RUN wget https://github.com/phacility/xhprof/archive/master.zip \
     && unlink ../../master.zip \
     && rm -rf ../../xhprof-master
 
+# 安装 mongodb
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
+
 # 安装 composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \
