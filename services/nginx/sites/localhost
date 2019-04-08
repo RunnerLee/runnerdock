@@ -1,14 +1,14 @@
 server {
-	listen 80;
-	server_name _;
+    listen 80;
+    server_name _;
     root /home/www-data;
-	autoindex on;
+    autoindex on;
 
-	location ~ \.php {
-                fastcgi_pass php72:9000;
-                fastcgi_split_path_info ^(.+\.php)(/.*)$;
-                include fastcgi_params;
-                fastcgi_param PATH_INFO $fastcgi_path_info;
-                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        }
+    location ~ \.php {
+        fastcgi_pass php72:9000;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
 }
