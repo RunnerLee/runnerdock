@@ -3,7 +3,6 @@ services:
     nginx:
         image: nginx:alpine
         ports:
-            - "9601:9601"
             - "80:80"
         volumes:
             - www_data:/home/www-data
@@ -42,6 +41,7 @@ services:
         ports:
             - "3306:3306"
         volumes:
+            - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
             - mysql_data:/var/lib/mysql
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -55,6 +55,7 @@ services:
             - "9300:9300"
         volumes:
             - elasticsearch_data:/usr/share/elasticsearch/data
+        # see: https://unix.stackexchange.com/questions/449595/meaning-of-the-values-for-ulimit-memlock-flag
         ulimits:
             memlock:
                 soft: -1

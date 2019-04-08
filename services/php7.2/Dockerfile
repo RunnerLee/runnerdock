@@ -2,14 +2,13 @@ FROM php:7.2-fpm-alpine
 
 LABEL maintainer="RunnerLee <runnerleer@gmail.com>"
 
-# 安装扩展
-RUN docker-php-ext-install bcmath pdo_mysql mysqli pcntl sockets
+# 安装依赖及部分扩展
+RUN set -xe \
+    && apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS \
+    && docker-php-ext-install bcmath pdo_mysql mysqli pcntl sockets
 
 # 安装 redis 扩展
-RUN apk add --no-cache --update libmemcached-libs zlib \
-    && set -xe \
-    && apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS \
-    && pecl install -o -f redis \
+RUN pecl install -o -f redis \
     && docker-php-ext-enable redis
 
 # 安装 gd 扩展
@@ -41,6 +40,12 @@ RUN pecl install xdebug \
 # 安装 mongodb
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
+
+# 安装 memcached 扩展
+RUN set -xe \
+    && apk add --no-cache libmemcached-dev \
+    && pecl install memcached \
+    && docker-php-ext-enable memcached
 
 # 安装 composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
