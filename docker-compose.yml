@@ -4,6 +4,7 @@ services:
         image: nginx:alpine
         ports:
             - "80:80"
+            - "${WEB_APP_PORTS}:${WEB_APP_PORTS}"
         volumes:
             - www_data:/home/www-data
             - "./services/nginx/nginx.conf:/etc/nginx/nginx.conf"
