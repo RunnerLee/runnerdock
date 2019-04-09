@@ -1,2 +1,7 @@
 .vscode
 .env
+*.yml
+!docker-compose.yml
+logs/*
+!logs/nginx
+!logs/php

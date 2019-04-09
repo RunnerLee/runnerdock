@@ -1,17 +1,26 @@
+# php 性能分析文件存放路径
 PHP_PROFILING_PATH=
 
+# nginx 日志存放路径
 NGINX_LOGS_PATH=
 
+# redis 数据存放路径
 REDIS_DATA_PATH=
 
+# mysql 数据存放路径
 MYSQL_DATA_PATH=
 
-WORKSPACE=
-
-PHP_XDEBUG_IDEKEY=
-
-PHP_XDEBUG_TRIGGER_KEY=
-
+# es 数据存放路径
 ELASTICSEARCH_DATA_PATH=
 
+# 工作空间
+WORKSPACE=
+
+# xdebug idekey
+PHP_XDEBUG_IDEKEY=
+
+# xdebug trace/profile
+PHP_XDEBUG_TRIGGER_KEY=
+
+# nginx 站点端口范围
 WEB_APP_PORTS=
