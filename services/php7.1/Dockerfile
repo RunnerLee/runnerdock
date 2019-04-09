@@ -17,7 +17,8 @@ RUN set -xe \
     && docker-php-ext-install gd
 
 # 安装 zip bz2 扩展
-RUN apk add --no-cache bzip2-dev \
+RUN set -xe \
+    && apk add --no-cache bzip2-dev \
     && docker-php-ext-install zip bz2
 
 # 安装 swoole 扩展
