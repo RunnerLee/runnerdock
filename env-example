@@ -22,5 +22,8 @@ PHP_XDEBUG_IDEKEY=
 # xdebug trace/profile
 PHP_XDEBUG_TRIGGER_KEY=
 
+# xdebug 断点调试远程地址
+PHP_XDEBUG_REMOTE_HOST=
+
 # nginx 站点端口范围
 WEB_APP_PORTS=

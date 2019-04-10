@@ -21,15 +21,18 @@ services:
         environment:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
+            PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
     php71:
         image: runnerlee/php:7.1-fpm
         volumes:
             - www_data:/home/www-data
+            - "./services/php7.1/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php7.1/php.ini:/usr/local/etc/php/php.ini"
     php72:
         image: runnerlee/php:7.2-fpm
         volumes:
             - www_data:/home/www-data
+            - "./services/php7.2/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php7.2/php.ini:/usr/local/etc/php/php.ini"
     redis:
         image: redis
