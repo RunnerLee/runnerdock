@@ -6,18 +6,18 @@ services:
             - "80:80"
             - "${WEB_APP_PORTS}:${WEB_APP_PORTS}"
         volumes:
-            - www_data:/home/www-data
+            - www-data:/home/www-data:cached
             - "./services/nginx/nginx.conf:/etc/nginx/nginx.conf"
             - "./services/nginx/sites/:/etc/nginx/sites"
-            - nginx_log_data:/var/log/nginx
+            - nginx-log-data:/var/log/nginx:delegated
     php56:
         image: runnerlee/php:5.6-fpm
         volumes:
-            - www_data:/home/www-data
+            - www-data:/home/www-data:cached
             - "./services/php5.6/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php5.6/conf.d/docker-php-ext-xhprof.ini:/usr/local/etc/php/conf.d/docker-php-ext-xhprof.ini"
             - "./services/php5.6/php.ini:/usr/local/etc/php/php.ini"
-            - php56_profiling_data:/var/www/profiling
+            - php56-profiling-data:/var/www/profiling:delegated
         environment:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
@@ -25,28 +25,38 @@ services:
     php71:
         image: runnerlee/php:7.1-fpm
         volumes:
-            - www_data:/home/www-data
+            - www-data:/home/www-data:cached
             - "./services/php7.1/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php7.1/php.ini:/usr/local/etc/php/php.ini"
+            - php71-profiling-data:/var/www/profiling:delegated
+        environment:
+            PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
+            PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
+            PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
     php72:
         image: runnerlee/php:7.2-fpm
         volumes:
-            - www_data:/home/www-data
+            - www-data:/home/www-data:cached
             - "./services/php7.2/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php7.2/php.ini:/usr/local/etc/php/php.ini"
+            - php72-profiling-data:/var/www/profiling:delegated
+        environment:
+            PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
+            PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
+            PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
     redis:
         image: redis
         ports:
             - "6379:6379"
         volumes:
-            - redis_data:/data
+            - redis-data:/data
     mysql:
         image: mysql:5.7
         ports:
             - "3306:3306"
         volumes:
             - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-            - mysql_data:/var/lib/mysql
+            - mysql-data:/var/lib/mysql
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
             MYSQL_ROOT_HOST: "%"
@@ -58,7 +68,7 @@ services:
             - "9200:9200"
             - "9300:9300"
         volumes:
-            - elasticsearch_data:/usr/share/elasticsearch/data
+            - elasticsearch-data:/usr/share/elasticsearch/data
         # see: https://unix.stackexchange.com/questions/449595/meaning-of-the-values-for-ulimit-memlock-flag
         ulimits:
             memlock:
@@ -76,39 +86,36 @@ services:
             - elasticsearch
 
 volumes:
-    www_data:
+    mysql-data:
+    redis-data:
+    elasticsearch-data:
+    www-data:
         driver: local
         driver_opts:
             type: none
             o: bind
             device: ${WORKSPACE}
-    mysql_data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${MYSQL_DATA_PATH}
-    redis_data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${REDIS_DATA_PATH}
-    nginx_log_data:
+    nginx-log-data:
         driver: local
         driver_opts:
             type: none
             o: bind
             device: ${NGINX_LOGS_PATH}
-    php56_profiling_data:
+    php56-profiling-data:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: ${PHP_PROFILING_PATH}
-    elasticsearch_data:
+            device: ${PHP_PROFILING_PATH}/5.6
+    php71-profiling-data:
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: ${ELASTICSEARCH_DATA_PATH}
+            device: ${PHP_PROFILING_PATH}/7.1
+    php72-profiling-data:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${PHP_PROFILING_PATH}/7.2

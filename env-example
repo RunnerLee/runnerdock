@@ -4,15 +4,6 @@ PHP_PROFILING_PATH=
 # nginx 日志存放路径
 NGINX_LOGS_PATH=
 
-# redis 数据存放路径
-REDIS_DATA_PATH=
-
-# mysql 数据存放路径
-MYSQL_DATA_PATH=
-
-# es 数据存放路径
-ELASTICSEARCH_DATA_PATH=
-
 # 工作空间
 WORKSPACE=
 
