@@ -46,6 +46,19 @@ RUN set -xe \
     && pecl install memcached-2.2.0 \
     && docker-php-ext-enable memcached
 
+# 安装 yac
+RUN set -xe \
+    && wget https://github.com/laruence/yac/archive/yac-0.9.2.zip \
+    && unzip yac-0.9.2.zip \
+    && cd yac-yac-0.9.2 \
+    && phpize \
+    && ./configure --with-php-config=php-config \
+    && make \
+    && make install \
+    && docker-php-ext-enable yac \
+    && cd .. \
+    && rm -rf yac-0.9.2.zip yac-yac-0.9.2
+
 # 安装 composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \

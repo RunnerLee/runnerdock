@@ -16,6 +16,7 @@ services:
             - www-data:/home/www-data:cached
             - "./services/php5.6/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php5.6/conf.d/docker-php-ext-xhprof.ini:/usr/local/etc/php/conf.d/docker-php-ext-xhprof.ini"
+            - "./services/php5.6/conf.d/docker-php-ext-yac.ini:/usr/local/etc/php/conf.d/docker-php-ext-yac.ini"
             - "./services/php5.6/php.ini:/usr/local/etc/php/php.ini"
             - php56-profiling-data:/var/www/profiling:delegated
         environment:
