@@ -4,6 +4,9 @@ PHP_PROFILING_PATH=
 # nginx 日志存放路径
 NGINX_LOGS_PATH=
 
+# mysql 日志存放路径
+MYSQL_LOGS_PATH=
+
 # 工作空间
 WORKSPACE=
 

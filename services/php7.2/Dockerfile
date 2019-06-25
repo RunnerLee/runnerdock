@@ -50,6 +50,11 @@ RUN set -xe \
     && pecl install memcached \
     && docker-php-ext-enable memcached
 
+# 安装 protobuf 扩展
+RUN set -xe \
+    && pecl install protobuf \
+    && docker-php-ext-enable protobuf
+
 # 安装 composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \

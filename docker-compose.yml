@@ -5,6 +5,8 @@ services:
         ports:
             - "80:80"
             - "${WEB_APP_PORTS}:${WEB_APP_PORTS}"
+        environment:
+            TZ: Asia/Shanghai
         volumes:
             - www-data:/home/www-data:cached
             - "./services/nginx/nginx.conf:/etc/nginx/nginx.conf"
@@ -23,6 +25,7 @@ services:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
             PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
+            TZ: Asia/Shanghai
     php71:
         image: runnerlee/php:7.1-fpm
         volumes:
@@ -34,6 +37,7 @@ services:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
             PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
+            TZ: Asia/Shanghai
     php72:
         image: runnerlee/php:7.2-fpm
         volumes:
@@ -45,12 +49,17 @@ services:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
             PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
+            TZ: Asia/Shanghai
     redis:
         image: redis
         ports:
             - "6379:6379"
+        command: redis-server /usr/local/etc/redis/redis.conf
         volumes:
             - redis-data:/data
+            - "./services/redis/redis.conf:/usr/local/etc/redis/redis.conf"
+        environment:
+            TZ: Asia/Shanghai
     mysql:
         image: mysql:5.7
         ports:
@@ -58,10 +67,20 @@ services:
         volumes:
             - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
             - mysql-data:/var/lib/mysql
+            - mysql-log-data:/var/log/mysql:delegated
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
             MYSQL_ROOT_HOST: "%"
             MYSQL_ROOT_PASSWORD: ""
+            TZ: Asia/Shanghai
+    mongo:
+        image: mongo:3.4
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo-data:/data/db
+        environment:
+            TZ: Asia/Shanghai
     elasticsearch:
         image: elasticsearch:6.7.0
         # see: https://www.elastic.co/guide/en/elasticsearch/reference/6.7/docker.html
@@ -79,14 +98,35 @@ services:
             cluster.name: "runnerdock-cluster"
             bootstrap.memory_lock: "true"
             ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+            TZ: Asia/Shanghai
     kibana:
         image: kibana:6.7.0
         ports:
             - "5601:5601"
         depends_on:
             - elasticsearch
+        environment:
+            TZ: Asia/Shanghai
+    filebeat:
+        build: ./services/filebeat
+        depends_on:
+            - elasticsearch
+        command: "filebeat -c /usr/share/filebeat/filebeat.nginx.yml"
+        volumes:
+            - nginx-log-data:/data/logs/nginx:cached
+            - mysql-log-data:/data/logs/mysql:cached
+            - www-data:/home/www-data:cached
+            - ./services/filebeat/modules.d/nginx.yml:/usr/share/filebeat/modules.d/nginx.yml
+            - ./services/filebeat/modules.d/mysql.yml:/usr/share/filebeat/modules.d/mysql.yml
+            - ./services/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+            - ./services/filebeat/filebeat.nginx.yml:/usr/share/filebeat/filebeat.nginx.yml
+            - ./services/filebeat/nginx.yml:/usr/share/filebeat/nginx.yml
+            - ./services/filebeat/filebeat.reference.yml:/usr/share/filebeat/filebeat.reference.yml
+        environment:
+            TZ: Asia/Shanghai
 
 volumes:
+    mongo-data:
     mysql-data:
     redis-data:
     elasticsearch-data:
@@ -102,6 +142,12 @@ volumes:
             type: none
             o: bind
             device: ${NGINX_LOGS_PATH}
+    mysql-log-data:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${MYSQL_LOGS_PATH}
     php56-profiling-data:
         driver: local
         driver_opts:
