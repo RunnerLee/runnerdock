@@ -8,48 +8,25 @@ services:
         environment:
             TZ: Asia/Shanghai
         volumes:
-            - www-data:/home/www-data:cached
+            - "/Users/runner/Code:/Users/runner/Code:cached"
             - "./services/nginx/nginx.conf:/etc/nginx/nginx.conf"
             - "./services/nginx/sites/:/etc/nginx/sites"
-            - nginx-log-data:/var/log/nginx:delegated
     php56:
-        image: runnerlee/php:5.6-fpm
+        build: ./services/php5.6
         volumes:
-            - www-data:/home/www-data:cached
+            - "/Users/runner/Code:/Users/runner/Code:cached"
             - "./services/php5.6/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
             - "./services/php5.6/conf.d/docker-php-ext-xhprof.ini:/usr/local/etc/php/conf.d/docker-php-ext-xhprof.ini"
-            - "./services/php5.6/conf.d/docker-php-ext-yac.ini:/usr/local/etc/php/conf.d/docker-php-ext-yac.ini"
+            - "./services/php5.6/conf.d/docker-php-ext-opcache.ini:/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini"
             - "./services/php5.6/php.ini:/usr/local/etc/php/php.ini"
-            - php56-profiling-data:/var/www/profiling:delegated
+            - "${PHP_PROFILING_PATH}/5.6:/var/www/profiling:delegated"
         environment:
             PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
             PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
             PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
             TZ: Asia/Shanghai
-    php71:
-        image: runnerlee/php:7.1-fpm
-        volumes:
-            - www-data:/home/www-data:cached
-            - "./services/php7.1/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
-            - "./services/php7.1/php.ini:/usr/local/etc/php/php.ini"
-            - php71-profiling-data:/var/www/profiling:delegated
-        environment:
-            PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
-            PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
-            PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
-            TZ: Asia/Shanghai
-    php72:
-        image: runnerlee/php:7.2-fpm
-        volumes:
-            - www-data:/home/www-data:cached
-            - "./services/php7.2/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
-            - "./services/php7.2/php.ini:/usr/local/etc/php/php.ini"
-            - php72-profiling-data:/var/www/profiling:delegated
-        environment:
-            PHP_XDEBUG_IDEKEY: ${PHP_XDEBUG_IDEKEY}
-            PHP_XDEBUG_TRIGGER_KEY: ${PHP_XDEBUG_TRIGGER_KEY}
-            PHP_XDEBUG_REMOTE_HOST: ${PHP_XDEBUG_REMOTE_HOST}
-            TZ: Asia/Shanghai
+        cap_add:
+            - SYS_PTRACE
     redis:
         image: redis
         ports:
@@ -67,7 +44,6 @@ services:
         volumes:
             - ./services/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
             - mysql-data:/var/lib/mysql
-            - mysql-log-data:/var/log/mysql:delegated
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
             MYSQL_ROOT_HOST: "%"
@@ -82,7 +58,8 @@ services:
         environment:
             TZ: Asia/Shanghai
     elasticsearch:
-        image: elasticsearch:6.7.0
+        # image: elasticsearch:6.7.0
+        build: ./services/elasticsearch
         # see: https://www.elastic.co/guide/en/elasticsearch/reference/6.7/docker.html
         ports:
             - "9200:9200"
@@ -100,69 +77,31 @@ services:
             ES_JAVA_OPTS: "-Xms512m -Xmx512m"
             TZ: Asia/Shanghai
     kibana:
-        image: kibana:6.7.0
+        image: kibana:6.7.1
         ports:
             - "5601:5601"
         depends_on:
             - elasticsearch
         environment:
             TZ: Asia/Shanghai
-    filebeat:
-        build: ./services/filebeat
-        depends_on:
-            - elasticsearch
-        command: "filebeat -c /usr/share/filebeat/filebeat.nginx.yml"
+    
+    rabbitmq:
+        image: rabbitmq:3.5.1-management
         volumes:
-            - nginx-log-data:/data/logs/nginx:cached
-            - mysql-log-data:/data/logs/mysql:cached
-            - www-data:/home/www-data:cached
-            - ./services/filebeat/modules.d/nginx.yml:/usr/share/filebeat/modules.d/nginx.yml
-            - ./services/filebeat/modules.d/mysql.yml:/usr/share/filebeat/modules.d/mysql.yml
-            - ./services/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-            - ./services/filebeat/filebeat.nginx.yml:/usr/share/filebeat/filebeat.nginx.yml
-            - ./services/filebeat/nginx.yml:/usr/share/filebeat/nginx.yml
-            - ./services/filebeat/filebeat.reference.yml:/usr/share/filebeat/filebeat.reference.yml
-        environment:
-            TZ: Asia/Shanghai
+            - "rabbitmq-data:/var/lib/rabbitmq:rw"
+            # - "./services/rabbitmqd/rabbitmq.config:/etc/rabbitmq/rabbitmq.config"
+        ports:
+            - 5672:5672
+            - 15672:15672
+    jaegertracing:
+        image: jaegertracing/all-in-one
+        ports:
+            - 6831:6831/udp
+            - 16686:16686
 
 volumes:
     mongo-data:
     mysql-data:
     redis-data:
     elasticsearch-data:
-    www-data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${WORKSPACE}
-    nginx-log-data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${NGINX_LOGS_PATH}
-    mysql-log-data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${MYSQL_LOGS_PATH}
-    php56-profiling-data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${PHP_PROFILING_PATH}/5.6
-    php71-profiling-data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${PHP_PROFILING_PATH}/7.1
-    php72-profiling-data:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ${PHP_PROFILING_PATH}/7.2
+    rabbitmq-data:

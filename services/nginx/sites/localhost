@@ -1,14 +1,14 @@
 server {
     listen 80;
     server_name _;
-    root /home/www-data;
+    root /Users/runner/Code;
     autoindex on;
 
     location ~ \.php {
-        fastcgi_pass host.docker.internal:9073;
+        fastcgi_pass host.docker.internal:9074;
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
         fastcgi_param PATH_INFO $fastcgi_path_info;
-        fastcgi_param SCRIPT_FILENAME /Users/runner/Code$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     }
 }

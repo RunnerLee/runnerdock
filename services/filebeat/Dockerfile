@@ -1,5 +1,3 @@
-FROM store/elastic/filebeat:6.7.0
+FROM store/elastic/filebeat:6.7.1
 
 LABEL maintiner="RunnerLee <runnerleer@gmail.com>"
-
-RUN filebeat modules enable nginx mysql
